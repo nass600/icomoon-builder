@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 const program = require('commander');
 // Require logic.js file and extract controller functions using JS destructuring assignment
-const build = require('./cli');
+const build = require('./src/commands/build');
 const package = require('./package.json');
 
 program
