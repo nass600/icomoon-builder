@@ -3,6 +3,9 @@ const chalk = require('chalk');
 const logger = require('../logger');
 const config = require('../config');
 
+/**
+ * Cleans previously generated files.
+ */
 const clean = () => {
     const files = [
         config.docs,
