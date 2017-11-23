@@ -2,6 +2,7 @@
 const program = require('commander');
 // Require logic.js file and extract controller functions using JS destructuring assignment
 const build = require('./src/commands/build');
+const clean = require('./src/commands/clean');
 const package = require('./package.json');
 
 program
@@ -12,9 +13,17 @@ program
 program
   .command('build <icomoonZipFile>')
   .alias('b')
-  .description('Build icomoon')
+  .description('Builds icomoon files.')
   .action((icomoonZipFile) => {
     build(icomoonZipFile);
+  });
+
+program
+  .command('clean')
+  .alias('c')
+  .description('Clean previously generated files.')
+  .action(() => {
+    clean();
   });
 
 program.parse(process.argv);
