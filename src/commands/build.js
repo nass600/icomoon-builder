@@ -3,8 +3,8 @@ const path = require('path');
 const chalk = require('chalk');
 const decompress = require('decompress');
 const replace = require('replace-in-file');
-const logger = require('./src/logger');
-const config = require('./src/config');
+const logger = require('../logger');
+const config = require('../config');
 
 const unzipIcomoon = (icomoonZipFile, destPath = config.temp) => {
     return decompress(icomoonZipFile, destPath).then(files => {
@@ -24,7 +24,7 @@ const moveFonts = () => {
 const moveStyles = () => {
     const files = [
         {
-            src: path.resolve(config.temp, 'styles.scss'),
+            src: path.resolve(config.temp, 'style.scss'),
             dest: path.resolve(config.styles, 'icons.scss')
         },
         {
