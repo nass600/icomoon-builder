@@ -8,7 +8,6 @@ const Table = require('cli-table')
 const build = require('../src/commands/build')
 const clean = require('../src/commands/clean')
 const version = require('../package.json').version
-const defaultConfig = require('../src/config')
 
 const renderFilesTable = (paths) => {
   let table = new Table({
@@ -35,7 +34,6 @@ program
   .option('--force', 'Executes the command straight away without user confirmation.')
   .action((icomoonZipFile, stylesPath, fontsPath, docsPath, options) => {
     const paths = {
-      temp: defaultConfig.temp,
       fonts: path.resolve(fontsPath),
       styles: path.resolve(stylesPath),
       docs: path.resolve(docsPath)
@@ -55,7 +53,11 @@ program
       if (answers.proceed === false) {
         return console.log(chalk.white.bgRed('\n Cancelled by the user \n'))
       }
-      build.cmd(icomoonZipFile, paths)
+      build.cmd(icomoonZipFile, paths).then(() => {
+        console.log(chalk.bgGreen.black(' All done '))
+      }).catch(err => {
+        console.log(chalk.bgRed.whiteBright(` ${err.message} `));
+      })
     })
   })
 
@@ -66,7 +68,6 @@ program
   .option('--force', 'Executes the command straight away without user confirmation.')
   .action((stylesPath, fontsPath, docsPath, options) => {
     const paths = [
-      defaultConfig.temp,
       path.resolve(fontsPath),
       path.resolve(stylesPath),
       path.resolve(docsPath)
