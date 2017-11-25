@@ -56,7 +56,7 @@ program
       build.cmd(icomoonZipFile, paths).then(() => {
         console.log(chalk.bgGreen.black(' All done '))
       }).catch(err => {
-        console.log(chalk.bgRed.whiteBright(` ${err.message} `));
+        console.log(chalk.bgRed.whiteBright(` ${err.message} `))
       })
     })
   })
