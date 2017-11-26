@@ -11,11 +11,12 @@ test('Icomoon zip file doesn\'t exist', () => {
   const icoomonZipPath = 'not/found'
   const paths = {
     docs: 'test/target/docs',
-    styles: 'test/target/scss/icons',
+    preProcessor: 'test/target/scss/icons',
+    css: 'test/target/css',
     fonts: 'test/target/fonts'
   }
   expect.assertions(1)
-  return build.cmd(icoomonZipPath, paths).catch(err => {
+  return build.cmd('custom-font', icoomonZipPath, paths).catch(err => {
     expect(err.message).toEqual('ENOENT: no such file or directory, open \'not/found\'')
   })
 })
@@ -24,15 +25,15 @@ test('Successful building for SASS', () => {
   const icoomonZipPath = 'test/fixtures/sass/fa-sass.zip'
   const paths = {
     docs: 'test/target/docs',
-    styles: 'test/target/scss/icons',
+    preProcessor: 'test/target/scss/icons',
+    css: 'test/target/css',
     fonts: 'test/target/fonts'
   }
-  expect.assertions(16)
-  return build.cmd(icoomonZipPath, paths).then(() => {
+  expect.assertions(17)
+  return build.cmd('custom-font', icoomonZipPath, paths).then(() => {
     expect(fs.existsSync(path.resolve('test/.tmp'))).toBe(false)
 
     const expectedFiles = [
-      'test/target/docs/demo/icons.css',
       'test/target/docs/demo/index.html',
       'test/target/docs/demo/scripts.js',
       'test/target/docs/demo/styles.css',
@@ -40,17 +41,19 @@ test('Successful building for SASS', () => {
       'test/target/fonts/fa.svg',
       'test/target/fonts/fa.ttf',
       'test/target/fonts/fa.woff',
-      'test/target/scss/icons/icons.scss',
-      'test/target/scss/icons/_variables.scss'
+      'test/target/scss/icons/custom-font.scss',
+      'test/target/scss/icons/_variables.scss',
+      'test/target/css/custom-font.css'
     ]
     expect(fs.existsSync(path.resolve('test/.tmp'))).toBe(false)
 
     expectedFiles.forEach((expectedFile) => {
       expect(fs.existsSync(path.resolve(expectedFile))).toBe(true)
     })
-    expect(fs.readdirSync(path.resolve('test/target/docs/demo')).length).toBe(4)
+    expect(fs.readdirSync(path.resolve('test/target/docs/demo')).length).toBe(3)
     expect(fs.readdirSync(path.resolve('test/target/docs')).length).toBe(2)
     expect(fs.readdirSync(path.resolve('test/target/fonts')).length).toBe(3)
     expect(fs.readdirSync(path.resolve('test/target/scss/icons')).length).toBe(2)
+    expect(fs.readdirSync(path.resolve('test/target/css')).length).toBe(1)
   })
 })
