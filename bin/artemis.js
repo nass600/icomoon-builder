@@ -44,22 +44,27 @@ program
       return build.cmd(icomoonZipFile, paths)
     }
 
-    inquirer.prompt([
-      {
-        type: 'confirm',
-        name: 'proceed',
-        message: `This is the list of files that will be copied once unzipped: \n${renderFilesTable(paths, fontName)}\n Do you want to proceed?`
-      }
-    ]).then(answers => {
-      if (answers.proceed === false) {
-        return console.log(chalk.white.bgRed('\n Cancelled by the user \n'))
-      }
-      build.cmd(fontName, icomoonZipFile, paths).then(() => {
-        console.log(chalk.bgGreen.black(' All done '))
-      }).catch(err => {
-        console.log(chalk.bgRed.whiteBright(` ${err.message} `))
+    build.unzipIcomoon(icomoonZipFile).then(() => {
+      inquirer.prompt([
+        {
+          type: 'confirm',
+          name: 'proceed',
+          message: `This is the list of files that will be copied once unzipped: \n${renderFilesTable(paths, fontName)}\n Do you want to proceed?`
+        }
+      ]).then(answers => {
+        if (answers.proceed === false) {
+          return build.removeTempDir().then(() => {
+            console.log(chalk.white.bgRed('\n Cancelled by the user \n'))
+          });
+        }
+        build.cmd(fontName, icomoonZipFile, paths).then(() => {
+          console.log(chalk.bgGreen.black(' All done '))
+        }).catch(err => {
+          console.log(chalk.bgRed.whiteBright(` ${err.message} `))
+        })
       })
-    })
+    });
+
   })
 
 program

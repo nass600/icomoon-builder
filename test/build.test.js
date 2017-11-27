@@ -8,6 +8,7 @@ afterEach(() => {
 })
 
 test('Icomoon zip file doesn\'t exist', () => {
+  const fontName = 'custom-font'
   const icoomonZipPath = 'not/found'
   const paths = {
     docs: 'test/target/docs',
@@ -16,12 +17,13 @@ test('Icomoon zip file doesn\'t exist', () => {
     fonts: 'test/target/fonts'
   }
   expect.assertions(1)
-  return build.cmd('custom-font', icoomonZipPath, paths).catch(err => {
+  return build.cmd(fontName, icoomonZipPath, paths).catch(err => {
     expect(err.message).toEqual('ENOENT: no such file or directory, open \'not/found\'')
   })
 })
 
 test('Successful building for SASS', () => {
+  const fontName = 'custom-font'
   const icoomonZipPath = 'test/fixtures/sass/fa-sass.zip'
   const paths = {
     docs: 'test/target/docs',
@@ -30,7 +32,7 @@ test('Successful building for SASS', () => {
     fonts: 'test/target/fonts'
   }
   expect.assertions(17)
-  return build.cmd('custom-font', icoomonZipPath, paths).then(() => {
+  return build.cmd(fontName, icoomonZipPath, paths).then(() => {
     expect(fs.existsSync(path.resolve('test/.tmp'))).toBe(false)
 
     const expectedFiles = [
@@ -38,12 +40,12 @@ test('Successful building for SASS', () => {
       'test/target/docs/demo/scripts.js',
       'test/target/docs/demo/styles.css',
       'test/target/docs/icomoon.json',
-      'test/target/fonts/fa.svg',
-      'test/target/fonts/fa.ttf',
-      'test/target/fonts/fa.woff',
-      'test/target/scss/icons/custom-font.scss',
+      `test/target/fonts/${fontName}.svg`,
+      `test/target/fonts/${fontName}.ttf`,
+      `test/target/fonts/${fontName}.woff`,
+      `test/target/scss/icons/${fontName}.scss`,
       'test/target/scss/icons/_variables.scss',
-      'test/target/css/custom-font.css'
+      `test/target/css/${fontName}.css`
     ]
     expect(fs.existsSync(path.resolve('test/.tmp'))).toBe(false)
 

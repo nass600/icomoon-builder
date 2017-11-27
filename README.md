@@ -11,31 +11,31 @@ If you are developing your own icons library using the Icomoon tool and you find
 
 ## Installation
 
-```bash
+````bash
 npm install --save-dev artemis
-```
+````
 
 ## Usage
 
 You can run it directly in your terminal with Node:
 
-```bash
+````bash
 node node_modules/.bin/artemis build <fontName> <icomoonZipFile> <preProcessorPath> <cssPath> <fontsPath> <docsPath>
-```
+````
 
 Or add it as a script in your `package.json`:
 
-```json
+````json
 "scripts": {
     "import": "artemis build"
 }
-```
+````
 
 And then run it:
 
-```bash
+````bash
 npm run import <fontName> <icomoonZipFile> <preProcessorPath> <cssPath> <fontsPath> <docsPath>
-```
+````
 
 ## License
 
