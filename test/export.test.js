@@ -1,7 +1,7 @@
 /* global expect, test, afterEach */
 const path = require('path')
 const fs = require('fs-extra')
-const build = require('../src/commands/build')
+const exportCmd = require('../src/commands/export')
 
 afterEach(() => {
   fs.remove(path.resolve('test/target'))
@@ -17,12 +17,12 @@ test('Icomoon zip file doesn\'t exist', () => {
     fonts: 'test/target/fonts'
   }
   expect.assertions(1)
-  return build.cmd(fontName, icoomonZipPath, paths).catch(err => {
+  return exportCmd.cmd(fontName, icoomonZipPath, paths).catch(err => {
     expect(err.message).toEqual('ENOENT: no such file or directory, open \'not/found\'')
   })
 })
 
-test('Successful building for SASS', () => {
+test('Successful exporting for SASS', () => {
   const fontName = 'custom-font'
   const icoomonZipPath = 'test/fixtures/sass/fa-sass.zip'
   const paths = {
@@ -32,7 +32,7 @@ test('Successful building for SASS', () => {
     fonts: 'test/target/fonts'
   }
   expect.assertions(17)
-  return build.cmd(fontName, icoomonZipPath, paths).then(() => {
+  return exportCmd.cmd(fontName, icoomonZipPath, paths).then(() => {
     expect(fs.existsSync(path.resolve('test/.tmp'))).toBe(false)
 
     const expectedFiles = [
