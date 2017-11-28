@@ -55,7 +55,7 @@ program
         if (answers.proceed === false) {
           return exportCmd.removeTempDir().then(() => {
             console.log(chalk.white.bgRed('\n Cancelled by the user \n'))
-          });
+          })
         }
         exportCmd.cmd(fontName, icomoonZipFile, paths).then(() => {
           console.log(chalk.bgGreen.black(' All done '))
@@ -63,8 +63,7 @@ program
           console.log(chalk.bgRed.whiteBright(` ${err.message} `))
         })
       })
-    });
-
+    })
   })
 
 program

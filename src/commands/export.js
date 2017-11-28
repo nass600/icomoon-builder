@@ -10,12 +10,12 @@ const TEMP_DIR = path.resolve('.tmp')
 
 /**
  * Extracts the font name.
- * 
- * @param {string} file 
+ *
+ * @param {string} file
  */
 const parseFontName = (file) => {
   var matches = /font-family:\s*'([^']*)'/g.exec(fs.readFileSync(file, 'utf-8'))
-  
+
   if (matches.length < 1) {
     throw Error('Unable to find font name')
   }
@@ -40,8 +40,8 @@ const unzipIcomoon = (icomoonZipFile) => {
 
 /**
  * Returns the list of files that will be copied.
- * 
- * @param {object} paths 
+ *
+ * @param {object} paths
  */
 const getFiles = (paths, fontName) => {
   const files = [
@@ -64,6 +64,10 @@ const getFiles = (paths, fontName) => {
     {
       src: path.resolve(TEMP_DIR, 'style.css'),
       dest: path.resolve(paths.css, `${fontName}.css`)
+    },
+    {
+      src: path.resolve(TEMP_DIR, 'style.css'),
+      dest: path.resolve(paths.css, `${fontName}.min.css`)
     }
   ];
 
@@ -98,8 +102,8 @@ const getFiles = (paths, fontName) => {
 
 /**
  * Copies the files from source to destination.
- * 
- * @param {object} paths 
+ *
+ * @param {object} paths
  */
 const copyFiles = (paths, fontName) => {
   const files = getFiles(paths, fontName);
@@ -113,7 +117,7 @@ const copyFiles = (paths, fontName) => {
 
 /**
  * Updates file paths references in the docs files.
- * 
+ *
  * @param {object} paths
  * @param {string} fontName
  */
@@ -128,7 +132,7 @@ const updateDocsFiles = (paths, fontName) => {
       to: [
         'styles.css',
         'scripts.js',
-        `${path.relative(path.resolve(paths.docs, 'demo'), paths.css)}/${fontName}.css`
+        `${path.relative(path.resolve(paths.docs, 'demo'), paths.css)}/${fontName}.min.css`
       ],
     })
     .then(() => {
@@ -138,9 +142,9 @@ const updateDocsFiles = (paths, fontName) => {
 
 /**
  * Updates file paths references in preProcessor files (sass, less, stylus).
- * 
- * @param {object} paths 
- * @param {string} fontName 
+ *
+ * @param {object} paths
+ * @param {string} fontName
  */
 const updatePreProcessorFiles = (paths, fontName) => {
   const preProcessorFile = path.resolve(paths.preProcessor, `${fontName}.scss`);
@@ -168,9 +172,9 @@ const updatePreProcessorFiles = (paths, fontName) => {
 }
 
 /**
- * Updates file paths references in css files and minifies them.
- * 
- * @param {object} paths 
+ * Updates file paths references in css files.
+ *
+ * @param {object} paths
  * @param {string} fontName
  */
 const updateCssFiles = (paths, fontName) => {
@@ -188,12 +192,23 @@ const updateCssFiles = (paths, fontName) => {
     to: [fontName],
   }))
   .then(() => {
-    return cssnano.process(fs.readFileSync(cssFile)).then(result => {
-      fs.writeFileSync(cssFile, result);
-    })
-  })
-  .then(() => {
     console.log('Modified css files to use the new references.');
+  })
+}
+
+/**
+ * Minifies the generated css.
+ *
+ * @param {object} paths
+ * @param {string} fontName
+ */
+const minifyCss = (paths, fontName) => {
+  const cssFile = path.resolve(paths.css, `${fontName}.css`)
+
+  return cssnano.process(fs.readFileSync(cssFile)).then(result => {
+    fs.writeFileSync(path.resolve(paths.css, `${fontName}.min.css`), result);
+
+    console.log('Minified css.');
   })
 }
 
@@ -217,7 +232,8 @@ const cmd = (fontName, icomoonZipFile, paths) => {
       .then(() => updatePreProcessorFiles(paths, fontName))
       .then(() => updateCssFiles(paths, fontName))
       .then(() => updateDocsFiles(paths, fontName))
-      .then(removeTempDir);
+      .then(() => minifyCss(paths, fontName))
+      .then(removeTempDir)
 }
 
 module.exports = {
