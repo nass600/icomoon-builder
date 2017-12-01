@@ -45,24 +45,26 @@ program
     }
 
     exportCmd.unzipIcomoon(icomoonZipFile).then(() => {
-      inquirer.prompt([
+      return inquirer.prompt([
         {
           type: 'confirm',
           name: 'proceed',
           message: `This is the list of files that will be copied once unzipped: \n${renderFilesTable(paths, fontName)}\n Do you want to proceed?`
         }
-      ]).then(answers => {
-        if (answers.proceed === false) {
-          return exportCmd.removeTempDir().then(() => {
-            console.log(chalk.white.bgRed('\n Cancelled by the user \n'))
-          })
-        }
-        exportCmd.cmd(fontName, icomoonZipFile, paths).then(() => {
-          console.log(chalk.bgGreen.black(' All done '))
-        }).catch(err => {
-          console.log(chalk.bgRed.whiteBright(` ${err.message} `))
+      ])
+    })
+    .then(answers => {
+      if (answers.proceed === false) {
+        return exportCmd.removeTempDir().then(() => {
+          console.log(chalk.white.bgRed('\n Cancelled by the user \n'))
         })
+      }
+      return exportCmd.cmd(fontName, icomoonZipFile, paths).then(() => {
+        console.log(chalk.bgGreen.black(' All done '))
       })
+    })
+    .catch(err => {
+      console.log(chalk.bgRed.whiteBright(` ${err.message} `))
     })
   })
 

@@ -45,7 +45,7 @@ test('Successful exporting for SASS', () => {
       `test/target/fonts/${fontName}.woff`,
       `test/target/scss/icons/${fontName}.scss`,
       'test/target/scss/icons/_variables.scss',
-      'test/target/scss/icons/icons.scss',
+      'test/target/scss/icons/_icons.scss',
       `test/target/css/${fontName}.css`,
       `test/target/css/${fontName}.min.css`
     ]

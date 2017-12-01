@@ -87,7 +87,7 @@ const getFiles = (paths, fontName) => {
       ...[
         {
           src: path.resolve(TEMP_DIR, 'style.scss'),
-          dest: path.resolve(paths.preProcessor, 'icons.scss')
+          dest: path.resolve(paths.preProcessor, '_icons.scss')
         },
         {
           src: path.resolve(TEMP_DIR, 'variables.scss'),
@@ -174,7 +174,7 @@ const createMainPreProcessorFile = (paths, fontName) => {
  * @param {string} fontName
  */
 const updatePreProcessorFiles = (paths, fontName) => {
-  const preProcessorFile = path.resolve(paths.preProcessor, 'icons.scss')
+  const preProcessorFile = path.resolve(paths.preProcessor, '_icons.scss')
   const formerFontName = parseFontName(path.resolve(TEMP_DIR, 'style.css'))
 
   return replace({
