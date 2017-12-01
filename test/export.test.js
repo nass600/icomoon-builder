@@ -31,7 +31,7 @@ test('Successful exporting for SASS', () => {
     css: 'test/target/css',
     fonts: 'test/target/fonts'
   }
-  expect.assertions(18)
+  expect.assertions(19)
   return exportCmd.cmd(fontName, icoomonZipPath, paths).then(() => {
     expect(fs.existsSync(path.resolve('test/.tmp'))).toBe(false)
 
@@ -45,6 +45,7 @@ test('Successful exporting for SASS', () => {
       `test/target/fonts/${fontName}.woff`,
       `test/target/scss/icons/${fontName}.scss`,
       'test/target/scss/icons/_variables.scss',
+      'test/target/scss/icons/icons.scss',
       `test/target/css/${fontName}.css`,
       `test/target/css/${fontName}.min.css`
     ]
@@ -56,7 +57,7 @@ test('Successful exporting for SASS', () => {
     expect(fs.readdirSync(path.resolve('test/target/docs/demo')).length).toBe(3)
     expect(fs.readdirSync(path.resolve('test/target/docs')).length).toBe(2)
     expect(fs.readdirSync(path.resolve('test/target/fonts')).length).toBe(3)
-    expect(fs.readdirSync(path.resolve('test/target/scss/icons')).length).toBe(2)
+    expect(fs.readdirSync(path.resolve('test/target/scss/icons')).length).toBe(3)
     expect(fs.readdirSync(path.resolve('test/target/css')).length).toBe(2)
   })
 })

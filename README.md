@@ -112,6 +112,7 @@ target/
 |   └── fancy-icons.woff
 └── scss
     ├── fancy-icons.scss
+    ├── icons.scss
     └── _variables.scss
 ```
 
@@ -119,19 +120,20 @@ The `export` command does not destroy directories so if you have more files in t
 
 The following is the list of files copied:
 
-| From                       | To                                          | Operations performed                                |
-| -------------------------- | ------------------------------------------- | --------------------------------------------------- |
-| .tmp/demo.html             | fancy-icons-project/docs/demo/index.html    | Updated references to assets                        |
-| .tmp/demo-files/demo.css   | fancy-icons-project/docs/demo/styles.css    |                                                     |
-| .tmp/demo-files/demo.js    | fancy-icons-project/docs/demo/scripts.js    |                                                     |
-| .tmp/selection.json        | fancy-icons-project/docs/icomoon.json       | Renamed to icomoon.json                             |
-| .tmp/style.css             | fancy-icons-project/css/fancy-icons.css     | Renamed to `<fontName>`, updated references         |
-| .tmp/style.css             | fancy-icons-project/css/fancy-icons.min.css | Minify the previous css                             |
-| .tmp/fonts/line-icons.woff | fancy-icons-project/fonts/fancy-icons.woff  | Renamed to `<fontName>`                             |
-| .tmp/fonts/line-icons.svg  | fancy-icons-project/fonts/fancy-icons.svg   | Renamed to `<fontName>`                             |
-| .tmp/fonts/line-icons.ttf  | fancy-icons-project/fonts/fancy-icons.ttf   | Renamed to `<fontName>`                             |
-| .tmp/style.scss            | fancy-icons-project/scss/fancy-icons.scss   | Updated references and renamed `$icomoon-font-path` |
-| .tmp/variables.scss        | fancy-icons-project/scss/_variables.scss    |                                                     |
+| From                       | To                                          | Operations performed                                               |
+| -------------------------- | ------------------------------------------- | ------------------------------------------------------------------ |
+| .tmp/demo.html             | fancy-icons-project/docs/demo/index.html    | Updated references to assets                                       |
+| .tmp/demo-files/demo.css   | fancy-icons-project/docs/demo/styles.css    |                                                                    |
+| .tmp/demo-files/demo.js    | fancy-icons-project/docs/demo/scripts.js    |                                                                    |
+| .tmp/selection.json        | fancy-icons-project/docs/icomoon.json       | Renamed to icomoon.json                                            |
+| .tmp/style.css             | fancy-icons-project/css/fancy-icons.css     | Renamed to `<fontName>`, updated references                        |
+|                            | fancy-icons-project/css/fancy-icons.min.css | Minify the previous css                                            |
+| .tmp/fonts/line-icons.woff | fancy-icons-project/fonts/fancy-icons.woff  | Renamed to `<fontName>`                                            |
+| .tmp/fonts/line-icons.svg  | fancy-icons-project/fonts/fancy-icons.svg   | Renamed to `<fontName>`                                            |
+| .tmp/fonts/line-icons.ttf  | fancy-icons-project/fonts/fancy-icons.ttf   | Renamed to `<fontName>`                                            |
+| .tmp/style.scss            | fancy-icons-project/scss/icons.scss         | Updated references and renamed `$icomoon-font-path`                |
+| .tmp/variables.scss        | fancy-icons-project/scss/_variables.scss    |                                                                    |
+|                            | fancy-icons-project/scss/fancy-icons.scss   | Imports the other two scss files. Created if does not exist before |
 
 ### Clean
 

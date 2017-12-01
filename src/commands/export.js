@@ -3,7 +3,6 @@ const path = require('path')
 const chalk = require('chalk')
 const decompress = require('decompress')
 const replace = require('replace-in-file')
-const clean = require('./clean')
 const cssnano = require('cssnano')
 
 const TEMP_DIR = path.resolve('.tmp')
@@ -30,13 +29,13 @@ const parseFontName = (file) => {
  */
 const unzipIcomoon = (icomoonZipFile) => {
   if (fs.existsSync(path.resolve(TEMP_DIR))) {
-    return Promise.resolve();
+    return Promise.resolve()
   }
 
   return decompress(icomoonZipFile, TEMP_DIR).then(files => {
-    console.log(`Unzipped icomoon files into ${chalk.green(TEMP_DIR)}`);
-  });
-};
+    console.log(`Unzipped icomoon files into ${chalk.green(TEMP_DIR)}`)
+  })
+}
 
 /**
  * Returns the list of files that will be copied.
@@ -66,18 +65,19 @@ const getFiles = (paths, fontName) => {
       dest: path.resolve(paths.css, `${fontName}.css`)
     },
     {
-      src: path.resolve(TEMP_DIR, 'style.css'),
-      dest: path.resolve(paths.css, `${fontName}.min.css`)
+      src: path.resolve(paths.css, `${fontName}.css`),
+      dest: path.resolve(paths.css, `${fontName}.min.css`),
+      ignore: true
     }
-  ];
+  ]
 
   // Font files
   const fontsPath = path.resolve(TEMP_DIR, 'fonts')
   fs.readdirSync(fontsPath).map((file) => {
-      files.push({
-        src: path.resolve(fontsPath, file),
-        dest: path.resolve(paths.fonts, `${fontName}${path.parse(file).ext}`)
-      })
+    files.push({
+      src: path.resolve(fontsPath, file),
+      dest: path.resolve(paths.fonts, `${fontName}${path.parse(file).ext}`)
+    })
   })
 
   // Sass files
@@ -87,18 +87,23 @@ const getFiles = (paths, fontName) => {
       ...[
         {
           src: path.resolve(TEMP_DIR, 'style.scss'),
-          dest: path.resolve(paths.preProcessor, `${fontName}.scss`)
+          dest: path.resolve(paths.preProcessor, 'icons.scss')
         },
         {
           src: path.resolve(TEMP_DIR, 'variables.scss'),
           dest: path.resolve(paths.preProcessor, '_variables.scss')
+        },
+        {
+          src: '',
+          dest: path.resolve(paths.preProcessor, `${fontName}.scss`),
+          ignore: true
         }
       ]
     )
   }
 
-  return files;
-};
+  return files
+}
 
 /**
  * Copies the files from source to destination.
@@ -106,14 +111,20 @@ const getFiles = (paths, fontName) => {
  * @param {object} paths
  */
 const copyFiles = (paths, fontName) => {
-  const files = getFiles(paths, fontName);
+  const files = getFiles(paths, fontName)
 
   return Promise
-    .all(files.map(item => fs.copy(item.src, item.dest)))
+    .all(files.map(item => {
+      if (item.ignore === true) {
+        return Promise.resolve()
+      }
+
+      return fs.copy(item.src, item.dest)
+    }))
     .then(() => {
-      console.log('Files copied to destination');
-    });
-};
+      console.log('Files copied to destination')
+    })
+}
 
 /**
  * Updates file paths references in the docs files.
@@ -123,22 +134,38 @@ const copyFiles = (paths, fontName) => {
  */
 const updateDocsFiles = (paths, fontName) => {
   return replace({
-      files: path.resolve(paths.docs, 'demo/index.html'),
-      from: [
-        'demo-files/demo.css',
-        'demo-files/demo.js',
-        'style.css'
-      ],
-      to: [
-        'styles.css',
-        'scripts.js',
-        `${path.relative(path.resolve(paths.docs, 'demo'), paths.css)}/${fontName}.min.css`
-      ],
-    })
+    files: path.resolve(paths.docs, 'demo/index.html'),
+    from: [
+      'demo-files/demo.css',
+      'demo-files/demo.js',
+      'style.css'
+    ],
+    to: [
+      'styles.css',
+      'scripts.js',
+      `${path.relative(path.resolve(paths.docs, 'demo'), paths.css)}/${fontName}.min.css`
+    ]
+  })
     .then(() => {
-      console.log('Modified doc files to use the new references.');
-    });
-};
+      console.log('Modified doc files to use the new references.')
+    })
+}
+
+/**
+ * Creates main pre-processor file to link the rest.
+ *
+ * @param {object} paths
+ * @param {string} fontName
+ */
+const createMainPreProcessorFile = (paths, fontName) => {
+  const mainFile = path.resolve(paths.preProcessor, `${fontName}.scss`)
+
+  if (fs.existsSync(mainFile)) {
+    return Promise.resolve()
+  }
+
+  return fs.appendFile(mainFile, '@import "variables";\n@import "icons";\n')
+}
 
 /**
  * Updates file paths references in preProcessor files (sass, less, stylus).
@@ -147,28 +174,31 @@ const updateDocsFiles = (paths, fontName) => {
  * @param {string} fontName
  */
 const updatePreProcessorFiles = (paths, fontName) => {
-  const preProcessorFile = path.resolve(paths.preProcessor, `${fontName}.scss`);
-  const formerFontName = parseFontName(path.resolve(TEMP_DIR, 'style.css'));
+  const preProcessorFile = path.resolve(paths.preProcessor, 'icons.scss')
+  const formerFontName = parseFontName(path.resolve(TEMP_DIR, 'style.css'))
 
   return replace({
     files: path.resolve(paths.preProcessor, `_variables.scss`),
     from: ['$icomoon-font-path: "fonts" !default;'],
-    to: [`$${fontName}-font-path: "${path.relative(paths.preProcessor, paths.fonts)}" !default;`],
+    to: [`$${fontName}-font-path: "${path.relative(paths.preProcessor, paths.fonts)}" !default;`]
   })
-  .then(() => replace({
-    files: preProcessorFile,
-    from: [
-      /\$icomoon-font-path/g,
-      new RegExp(formerFontName, 'g')
-    ],
-    to: [
-      `$${fontName}-font-path`,
-      fontName
-    ],
-  }))
-  .then(() => {
-    console.log('Modified pre-processor files to use the new references.');
-  });
+    .then(() => replace({
+      files: preProcessorFile,
+      from: [
+        /\$icomoon-font-path/g,
+        new RegExp(formerFontName, 'g'),
+        '@import "variables";\n\n'
+      ],
+      to: [
+        `$${fontName}-font-path`,
+        fontName,
+        ''
+      ]
+    }))
+    .then(() => createMainPreProcessorFile(paths, fontName))
+    .then(() => {
+      console.log('Modified pre-processor files to use the new references.')
+    })
 }
 
 /**
@@ -179,21 +209,21 @@ const updatePreProcessorFiles = (paths, fontName) => {
  */
 const updateCssFiles = (paths, fontName) => {
   const cssFile = path.resolve(paths.css, `${fontName}.css`)
-  const formerFontName = parseFontName(path.resolve(TEMP_DIR, 'style.css'));
+  const formerFontName = parseFontName(path.resolve(TEMP_DIR, 'style.css'))
 
   return replace({
     files: cssFile,
     from: [/url\('fonts\//g],
-    to: [`url('${path.relative(paths.css, paths.fonts)}/`],
+    to: [`url('${path.relative(paths.css, paths.fonts)}/`]
   })
-  .then(() => replace({
-    files: cssFile,
-    from: [new RegExp(formerFontName, 'g')],
-    to: [fontName],
-  }))
-  .then(() => {
-    console.log('Modified css files to use the new references.');
-  })
+    .then(() => replace({
+      files: cssFile,
+      from: [new RegExp(formerFontName, 'g')],
+      to: [fontName]
+    }))
+    .then(() => {
+      console.log('Modified css files to use the new references.')
+    })
 }
 
 /**
@@ -206,9 +236,9 @@ const minifyCss = (paths, fontName) => {
   const cssFile = path.resolve(paths.css, `${fontName}.css`)
 
   return cssnano.process(fs.readFileSync(cssFile)).then(result => {
-    fs.writeFileSync(path.resolve(paths.css, `${fontName}.min.css`), result);
+    fs.writeFileSync(path.resolve(paths.css, `${fontName}.min.css`), result)
 
-    console.log('Minified css.');
+    console.log('Minified css.')
   })
 }
 
@@ -216,6 +246,10 @@ const minifyCss = (paths, fontName) => {
  * Removes temporary folder.
  */
 const removeTempDir = () => {
+  if (!fs.existsSync(TEMP_DIR)) {
+    return Promise.resolve()
+  }
+
   return fs.remove(TEMP_DIR).then(() => {
     console.log(`Removed temporary directory ${chalk.green(TEMP_DIR)}`)
   })
@@ -227,13 +261,13 @@ const removeTempDir = () => {
  * @param {string} icomoonZipFile
  */
 const cmd = (fontName, icomoonZipFile, paths) => {
-    return unzipIcomoon(icomoonZipFile)
-      .then(() => copyFiles(paths, fontName))
-      .then(() => updatePreProcessorFiles(paths, fontName))
-      .then(() => updateCssFiles(paths, fontName))
-      .then(() => updateDocsFiles(paths, fontName))
-      .then(() => minifyCss(paths, fontName))
-      .then(removeTempDir)
+  return unzipIcomoon(icomoonZipFile)
+    .then(() => copyFiles(paths, fontName))
+    .then(() => updatePreProcessorFiles(paths, fontName))
+    .then(() => updateCssFiles(paths, fontName))
+    .then(() => updateDocsFiles(paths, fontName))
+    .then(() => minifyCss(paths, fontName))
+    .then(removeTempDir)
 }
 
 module.exports = {
@@ -241,4 +275,4 @@ module.exports = {
   getFiles: getFiles,
   unzipIcomoon: unzipIcomoon,
   removeTempDir: removeTempDir
-};
+}
