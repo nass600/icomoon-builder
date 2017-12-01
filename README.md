@@ -112,7 +112,7 @@ target/
 |   └── fancy-icons.woff
 └── scss
     ├── fancy-icons.scss
-    ├── icons.scss
+    ├── _icons.scss
     └── _variables.scss
 ```
 
@@ -131,7 +131,7 @@ The following is the list of files copied:
 | .tmp/fonts/line-icons.woff | fancy-icons-project/fonts/fancy-icons.woff  | Renamed to `<fontName>`                                            |
 | .tmp/fonts/line-icons.svg  | fancy-icons-project/fonts/fancy-icons.svg   | Renamed to `<fontName>`                                            |
 | .tmp/fonts/line-icons.ttf  | fancy-icons-project/fonts/fancy-icons.ttf   | Renamed to `<fontName>`                                            |
-| .tmp/style.scss            | fancy-icons-project/scss/icons.scss         | Updated references and renamed `$icomoon-font-path`                |
+| .tmp/style.scss            | fancy-icons-project/scss/_icons.scss        | Updated references and renamed `$icomoon-font-path`                |
 | .tmp/variables.scss        | fancy-icons-project/scss/_variables.scss    |                                                                    |
 |                            | fancy-icons-project/scss/fancy-icons.scss   | Imports the other two scss files. Created if does not exist before |
 
