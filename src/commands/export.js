@@ -186,12 +186,16 @@ const updatePreProcessorFiles = (paths, fontName) => {
       files: preProcessorFile,
       from: [
         /\$icomoon-font-path/g,
-        new RegExp(formerFontName, 'g'),
+        new RegExp(`font-family: '${formerFontName}'`, 'g'), // font-family
+        new RegExp(`/${formerFontName}.`, 'g'), // font-face url
+        new RegExp(`#${formerFontName}'`, 'g'), // font-face hashbang svg
         '@import "variables";\n\n'
       ],
       to: [
         `$${fontName}-font-path`,
-        fontName,
+        `font-family: '${fontName}'`,
+        `/${fontName}.`,
+        `#${fontName}'`,
         ''
       ]
     }))
