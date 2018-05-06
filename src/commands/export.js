@@ -303,7 +303,7 @@ const cmd = (fontName, icomoonZipFile, paths, minify) => {
     .then(() => updateCssFiles(paths, fontName))
     .then(() => updateDocsFiles(paths, fontName, minify))
     .then(() => minify && minifyCss(paths, fontName))
-    .finally(removeTempDir)
+    .then(removeTempDir)
 }
 
 module.exports = {
