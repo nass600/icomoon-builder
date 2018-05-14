@@ -1,6 +1,5 @@
 const fs = require('fs-extra')
 const path = require('path')
-const chalk = require('chalk')
 const decompress = require('decompress')
 const replace = require('replace-in-file')
 const cssnano = require('cssnano')
@@ -45,15 +44,6 @@ const getFiles = (paths, fontName, minify) => {
 
   // Doc files
   if (paths.docs) {
-    if (!paths.css) {
-      throw new Error('--docs option requires --css option to be used as well')
-    }
-    if (paths.fontsPublic) {
-      throw new Error('--docs option cannot be used with --fonts-public')
-    }
-    if (paths.cssName && path.extname(paths.cssName) !== '.css') {
-      console.log(chalk.yellow('Warning: using an extension different than .css when using the --css-name option breaks the docs'))
-    }
     files.push(
       {
         src: 'demo.html',
@@ -66,6 +56,10 @@ const getFiles = (paths, fontName, minify) => {
       {
         src: 'demo-files/demo.js',
         dest: path.resolve(paths.docs, 'scripts.js')
+      },
+      {
+        src: 'style.css',
+        dest: path.resolve(paths.docs, `${fontName}.css`)
       }
     )
   }
@@ -94,13 +88,21 @@ const getFiles = (paths, fontName, minify) => {
   }
 
   // Font files
-  if (paths.fonts) {
+  if (paths.fonts || paths.docs) {
     const fontsPath = path.resolve(TEMP_DIR, 'fonts')
     fs.readdirSync(fontsPath).map((file) => {
-      files.push({
-        src: path.join('fonts', file),
-        dest: path.resolve(paths.fonts, `${fontName}${path.parse(file).ext}`)
-      })
+      if (paths.fonts) {
+        files.push({
+          src: path.join('fonts', file),
+          dest: path.resolve(paths.fonts, `${fontName}${path.parse(file).ext}`)
+        })
+      }
+      if (paths.docs) {
+        files.push({
+          src: path.join('fonts', file),
+          dest: path.resolve(paths.docs, 'fonts', file)
+        })
+      }
     })
   }
 
@@ -158,7 +160,7 @@ const copyFiles = (paths, fontName) => {
  * @param {object} paths
  * @param {string} fontName
  */
-const updateDocsFiles = (paths, fontName, minify) => {
+const updateDocsFiles = (paths, fontName) => {
   if (!paths.docs) return
   return replace({
     files: path.resolve(paths.docs, 'index.html'),
@@ -170,8 +172,7 @@ const updateDocsFiles = (paths, fontName, minify) => {
     to: [
       'styles.css',
       'scripts.js',
-      `${path.relative(path.resolve(paths.docs), paths.css)}/${paths.cssName || fontName + (minify
-        ? '.min' : '') + '.css'}`
+      `${fontName}.css`
     ]
   })
     .then(() => {
@@ -301,7 +302,7 @@ const cmd = (fontName, icomoonZipFile, paths, minify) => {
     .then(() => copyFiles(paths, fontName))
     .then(() => updatePreProcessorFiles(paths, fontName))
     .then(() => updateCssFiles(paths, fontName))
-    .then(() => updateDocsFiles(paths, fontName, minify))
+    .then(() => updateDocsFiles(paths, fontName))
     .then(() => minify && minifyCss(paths, fontName))
     .then(removeTempDir)
 }

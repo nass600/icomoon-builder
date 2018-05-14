@@ -57,7 +57,7 @@ test('Successful exporting for SASS', () => {
       expect(fs.existsSync(path.resolve(expectedFile))).toBe(true)
     })
     expect(fs.readdirSync(path.resolve('test/target/css')).length).toBe(2)
-    expect(fs.readdirSync(path.resolve('test/target/docs')).length).toBe(3)
+    expect(fs.readdirSync(path.resolve('test/target/docs')).length).toBe(5)
     expect(fs.readdirSync(path.resolve('test/target/fonts')).length).toBe(3)
     expect(fs.readdirSync(path.resolve('test/target/json')).length).toBe(1)
     expect(fs.readdirSync(path.resolve('test/target/scss/icons')).length).toBe(3)
